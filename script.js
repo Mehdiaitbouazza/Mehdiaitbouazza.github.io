@@ -102,142 +102,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
-    // --- 5. Animated Skills Constellation ---
-    const canvas = document.getElementById('skills-canvas');
-    if (canvas) {
-        const ctx = canvas.getContext('2d');
-        const container = document.querySelector('.skills-canvas-container');
-
-        const setCanvasDimensions = () => {
-            canvas.width = container.offsetWidth;
-            canvas.height = container.offsetHeight;
-        };
-        setCanvasDimensions();
-
-        const style = getComputedStyle(document.documentElement);
-        const primaryColor = style.getPropertyValue('--primary-color').trim();
-        const secondaryColor = style.getPropertyValue('--secondary-color').trim();
-        const strongTextColor = style.getPropertyValue('--text-strong').trim();
-
-        let particlesArray = [];
-        const skills = [
-            { text: 'C Programming', size: 1.2, isTech: true }, { text: 'Data Structures', size: 1.1, isTech: true },
-            { text: 'Algorithms', size: 1.1, isTech: true }, { text: 'Linux Basics', size: 1, isTech: true },
-            { text: 'Vim', size: 1, isTech: true }, { text: 'Leadership', size: 1.1, isTech: false },
-            { text: 'Problem-Solving', size: 1.2, isTech: false }, { text: 'Teamwork', size: 1, isTech: false },
-            { text: 'Crisis Management', size: 1, isTech: false }, { text: 'Adaptability', size: 1, isTech: false }
-        ];
-
-        const mouse = { x: null, y: null, radius: 80 };
-
-        canvas.addEventListener('mousemove', (event) => {
-            const rect = canvas.getBoundingClientRect();
-            mouse.x = event.clientX - rect.left;
-            mouse.y = event.clientY - rect.top;
+    // --- 5. Flipping Cards Logic ---
+    const cards = document.querySelectorAll('.skill-card');
+    cards.forEach(card => {
+        card.addEventListener('click', () => {
+            card.classList.toggle('is-flipped');
         });
+    });
 
-        canvas.addEventListener('mouseout', () => {
-            mouse.x = null;
-            mouse.y = null;
-        });
-
-        class Particle {
-            constructor(x, y, dirX, dirY, size, text, isTech) {
-                this.x = x; this.y = y; this.dirX = dirX; this.dirY = dirY;
-                this.baseSize = size * 5; this.size = this.baseSize;
-                this.text = text; this.isTech = isTech; this.isStopped = false;
-            }
-
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-                ctx.fillStyle = this.isTech ? primaryColor : secondaryColor;
-                ctx.fill();
-
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-                ctx.shadowBlur = 5;
-
-                ctx.fillStyle = strongTextColor;
-                ctx.font = `bold ${this.size * 2.5}px Rubik`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(this.text, this.x, this.y);
-
-                ctx.shadowColor = 'transparent';
-                ctx.shadowBlur = 0;
-            }
-
-            update() {
-                if (this.x > canvas.width || this.x < 0) this.dirX = -this.dirX;
-                if (this.y > canvas.height || this.y < 0) this.dirY = -this.dirY;
-
-                let dx = mouse.x - this.x;
-                let dy = mouse.y - this.y;
-                let distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < mouse.radius) {
-                    this.isStopped = true;
-                    this.size = this.baseSize * 1.5;
-                } else {
-                    this.isStopped = false;
-                    this.size = this.baseSize;
-                }
-
-                if (!this.isStopped) {
-                    this.x += this.dirX;
-                    this.y += this.dirY;
-                }
-                this.draw();
-            }
-        }
-
-        function init() {
-            particlesArray = [];
-            for (const skill of skills) {
-                let size = skill.size;
-                let x = Math.random() * (canvas.width - size * 20) + size * 10;
-                let y = Math.random() * (canvas.height - size * 20) + size * 10;
-                let dirX = (Math.random() * 0.4) - 0.2;
-                let dirY = (Math.random() * 0.4) - 0.2;
-                particlesArray.push(new Particle(x, y, dirX, dirY, size, skill.text, skill.isTech));
-            }
-        }
-
-        function connect() {
-            let opacityValue = 1;
-            for (let a = 0; a < particlesArray.length; a++) {
-                for (let b = a; b < particlesArray.length; b++) {
-                    let distance = ((particlesArray[a].x - particlesArray[b].x) ** 2) + ((particlesArray[a].y - particlesArray[b].y) ** 2);
-                    if (distance < (canvas.width / 7) * (canvas.height / 7)) {
-                        opacityValue = 1 - (distance / 25000);
-                        ctx.strokeStyle = `rgba(176, 190, 197, ${opacityValue * 0.5})`;
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-        }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (const particle of particlesArray) {
-                particle.update();
-            }
-            connect();
-        }
-
-        init();
-        animate();
-
-        window.addEventListener('resize', () => {
-            setCanvasDimensions();
-            init();
-        });
-    }
 
     // --- 6. Shape Parallax Scroll Effect ---
     const shapes = document.querySelectorAll('.hero-shapes .shape');
@@ -249,6 +121,45 @@ document.addEventListener('DOMContentLoaded', function() {
                 const speed = (index + 1) * 0.15;
                 shape.style.transform = `translateY(${scrollPosition * speed}px)`;
             });
+        });
+    }
+
+    // --- 7. Accordion Logic ---
+    const accordionHeaders = document.querySelectorAll('.accordion-header');
+    accordionHeaders.forEach(clickedHeader => {
+        clickedHeader.addEventListener('click', () => {
+            const isAlreadyOpen = clickedHeader.classList.contains('active');
+            accordionHeaders.forEach(header => {
+                header.classList.remove('active');
+                header.nextElementSibling.style.maxHeight = null;
+            });
+            if (!isAlreadyOpen) {
+                clickedHeader.classList.add('active');
+                const content = clickedHeader.nextElementSibling;
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        });
+    });
+
+    // --- 8. Image Modal Logic ---
+    const imageTrigger = document.getElementById('image-trigger');
+    const imageModal = document.getElementById('image-modal');
+    const modalClose = document.getElementById('modal-close');
+
+    if (imageTrigger && imageModal && modalClose) {
+        imageTrigger.addEventListener('click', () => {
+            imageModal.classList.add('visible');
+        });
+
+        const closeModal = () => {
+            imageModal.classList.remove('visible');
+        };
+
+        modalClose.addEventListener('click', closeModal);
+        imageModal.addEventListener('click', (e) => {
+            if (e.target === imageModal) {
+                closeModal();
+            }
         });
     }
 
