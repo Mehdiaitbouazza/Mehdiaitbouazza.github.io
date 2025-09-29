@@ -163,4 +163,73 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // --- 9. Certificate Gallery Modal Logic ---
+    const certificateCards = document.querySelectorAll('.certificate-card:not(.placeholder)');
+    const galleryModal = document.getElementById('gallery-modal');
+    const galleryModalImage = document.getElementById('gallery-modal-image');
+    const galleryModalClose = document.getElementById('gallery-modal-close');
+
+    if (galleryModal) {
+        certificateCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const imageSrc = card.dataset.imageSrc;
+                galleryModalImage.src = imageSrc;
+                galleryModal.classList.add('visible');
+            });
+        });
+
+        const closeGalleryModal = () => {
+            galleryModal.classList.remove('visible');
+            galleryModalImage.src = ""; 
+        };
+
+        galleryModalClose.addEventListener('click', closeGalleryModal);
+        galleryModal.addEventListener('click', (e) => {
+            if (e.target === galleryModal) {
+                closeGalleryModal();
+            }
+        });
+    }
+
+    // --- 10. Language Switcher Logic ---
+    const langSwitcher = document.querySelector('.language-switcher');
+    const langBtns = document.querySelectorAll('.lang-btn');
+    const translatableElements = document.querySelectorAll('[lang]');
+
+    const switchLanguage = (targetLang) => {
+        translatableElements.forEach(el => {
+            if (el.getAttribute('lang') === targetLang) {
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        });
+
+        langBtns.forEach(btn => {
+            if (btn.dataset.lang === targetLang) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        localStorage.setItem('preferredLanguage', targetLang);
+    };
+
+    if (langSwitcher) {
+        langSwitcher.addEventListener('click', (e) => {
+            if (e.target.classList.contains('lang-btn')) {
+                const selectedLang = e.target.dataset.lang;
+                switchLanguage(selectedLang);
+            }
+        });
+    }
+
+    const savedLang = localStorage.getItem('preferredLanguage');
+    if (savedLang) {
+        switchLanguage(savedLang);
+    } else {
+        switchLanguage('en');
+    }
+
 });
