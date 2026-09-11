@@ -341,4 +341,34 @@ document.addEventListener('DOMContentLoaded', function() {
         switchLanguage('en');
     }
 
+
+    // --- 11. Hide Header on Scroll Down, Show on Scroll Up ---
+    const siteHeader = document.querySelector('header');
+    if (siteHeader) {
+        let lastScrollY = window.scrollY;
+        const scrollThreshold = 10; // ignore tiny scroll jitters
+
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            const scrollDiff = currentScrollY - lastScrollY;
+
+            if (Math.abs(scrollDiff) < scrollThreshold) {
+                return;
+            }
+
+            if (currentScrollY <= 0) {
+                // Always show header at the very top of the page
+                siteHeader.classList.remove('header-hidden');
+            } else if (scrollDiff > 0) {
+                // Scrolling down
+                siteHeader.classList.add('header-hidden');
+            } else {
+                // Scrolling up
+                siteHeader.classList.remove('header-hidden');
+            }
+
+            lastScrollY = currentScrollY;
+        });
+    }
+
 });

@@ -102,6 +102,12 @@ header {
     z-index: 1000;
     padding: 1rem 5%;
     box-sizing: border-box;
+    transform: translateY(0);
+    transition: transform 0.35s ease;
+}
+
+header.header-hidden {
+    transform: translateY(-100%);
 }
 
 nav {
